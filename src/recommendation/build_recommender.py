@@ -3,7 +3,7 @@ import joblib
 from sklearn.metrics.pairwise import cosine_similarity
 
 df = pd.read_csv(
-    r"C:\Users\91991\Desktop\internships\AMDOX\data\processed\clean_online_retail.csv"
+    "\data\processed\clean_online_retail.csv"
 )
 
 product_counts = df["StockCode"].value_counts()
@@ -48,12 +48,12 @@ product_map = (
 
 joblib.dump(
     similarity_df,
-    r"C:\Users\91991\Desktop\internships\AMDOX\models\recommendation\item_similarity.pkl"
+    "\models\recommendation\item_similarity.pkl"
 )
 
 joblib.dump(
     product_map,
-    r"C:\Users\91991\Desktop\internships\AMDOX\models\recommendation\product_map.pkl"
+    "\models\recommendation\product_map.pkl"
 )
 
 print("Recommendation model saved.")

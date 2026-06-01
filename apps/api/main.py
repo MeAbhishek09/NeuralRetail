@@ -1,26 +1,49 @@
 from fastapi import FastAPI
 import pandas as pd
 
-
 from src.recommendation.recommender import (
     recommend_products
 )
 
 # ==========================================
-# CREATE APP
+# CREATE API
 # ==========================================
 
 app = FastAPI(
-    title="NeuralRetail API"
+
+    title="NeuralRetail API",
+
+    description=(
+        "Customer Segmentation, "
+        "Demand Forecasting, "
+        "Inventory Optimization and "
+        "Recommendation API"
+    ),
+
+    version="1.0.0"
 )
 
 # ==========================================
 # LOAD DATA
 # ==========================================
 
+# Load customer segments
+
 segments_df = pd.read_csv(
-    r"C:\Users\91991\Desktop\internships\AMDOX\data\processed\customer_segments_labeled.csv"
+    "data/processed/customer_segments_labeled.csv"
 )
+
+churn_df = pd.read_csv(
+    "data/processed/customer_segments_labeled.csv"
+)
+
+inventory_intelligence = pd.read_csv(
+    "data/processed/inventory_intelligence.csv"
+)
+
+churn_df["Churn"] = (
+    churn_df["Recency"] > 90
+).astype(int)
 
 # ==========================================
 # HOME
@@ -30,35 +53,41 @@ segments_df = pd.read_csv(
 def home():
 
     return {
+
         "message": "NeuralRetail API Running"
     }
 
 # ==========================================
-# HEALTH
+# HEALTH CHECK
 # ==========================================
 
 @app.get("/health")
 def health():
 
     return {
+
         "status": "healthy"
     }
 
 # ==========================================
-# SEGMENTS
+# CUSTOMER SEGMENTS
 # ==========================================
 
 @app.get("/segments")
 def segments():
 
-    return (
-        segments_df["Segment"]
-        .value_counts()
-        .to_dict()
-    )
+    return {
+
+        "segment_distribution": (
+
+            segments_df["Segment"]
+            .value_counts()
+            .to_dict()
+        )
+    }
 
 # ==========================================
-# FORECAST
+# FORECAST METRICS
 # ==========================================
 
 @app.get("/forecast")
@@ -76,7 +105,7 @@ def forecast():
     }
 
 # ==========================================
-# INVENTORY
+# INVENTORY RESULTS
 # ==========================================
 
 @app.get("/inventory")
@@ -91,18 +120,109 @@ def inventory():
         "eoq": 15860
     }
 
-
+# ==========================================
+# PRODUCT RECOMMENDATIONS
+# ==========================================
 
 @app.get("/recommend/{product_id}")
 def recommend(
     product_id: str
 ):
 
-    recommendations = recommend_products(
-        product_id
+    try:
+
+        recommendations = (
+            recommend_products(
+                product_id
+            )
+        )
+
+        return {
+
+            "product": product_id,
+
+            "recommendations": recommendations
+        }
+
+    except Exception:
+
+        return {
+
+            "error": (
+                f"Product {product_id} not found"
+            )
+        }
+
+# ==========================================
+# API INFORMATION
+# ==========================================
+
+@app.get("/info")
+def info():
+
+    return {
+
+        "project": "NeuralRetail",
+
+        "modules": [
+
+            "Customer Segmentation",
+
+            "Demand Forecasting",
+
+            "Inventory Optimization",
+
+            "Recommendation System"
+        ]
+    }
+
+
+@app.get("/churn")
+def churn():
+
+    active = (
+        churn_df["Churn"] == 0
+    ).sum()
+
+    churned = (
+        churn_df["Churn"] == 1
+    ).sum()
+
+    churn_rate = round(
+
+        churned
+
+        / len(churn_df)
+
+        * 100,
+
+        2
     )
 
     return {
-        "product": product_id,
-        "recommendations": recommendations
+
+        "active_customers": int(active),
+
+        "churned_customers": int(churned),
+
+        "churn_rate": churn_rate,
+
+        "best_model": "Logistic Regression",
+
+        "roc_auc": 0.737
     }
+
+
+@app.get("/inventory-intelligence")
+def inventory_intelligence_api():
+
+    return (
+
+        inventory_intelligence[
+            "ABC_XYZ"
+        ]
+
+        .value_counts()
+
+        .to_dict()
+    )
