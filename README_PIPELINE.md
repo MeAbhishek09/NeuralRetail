@@ -461,11 +461,11 @@ Capabilities:
 | Retail Cleaning       | ✅           |
 | Revenue Feature       | ✅           |
 | Clean Dataset Saved   | ✅           |
-| RFM Features          | In Progress |
-| Forecasting Pipeline  | Pending     |
-| Dashboard             | Pending     |
-| APIs                  | Pending     |
-| Recommendation System | Planned     |
+| RFM Features          | I✅          |
+| Forecasting Pipeline  | ✅           |
+| Dashboard             | ✅           |
+| APIs                  | ✅           |
+| Recommendation System | ✅           |
 
 ---
 
